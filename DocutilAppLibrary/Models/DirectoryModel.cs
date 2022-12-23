@@ -2,7 +2,7 @@
 
 namespace DocutilAppLibrary.Models
 {
-    public class DirectoryModel:IListItem
+    public class DirectoryModel : IListItem
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]

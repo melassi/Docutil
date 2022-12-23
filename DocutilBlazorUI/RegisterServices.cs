@@ -1,6 +1,6 @@
 ﻿namespace DocutilBlazorUI
 {
-    public static class RegisterServices
+   public static class RegisterServices
    {
       public static void ConfigureServices(this WebApplicationBuilder builder)
       {

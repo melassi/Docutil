@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using MongoDB.Driver;
 
 namespace DocutilAppLibrary.DataAccess;
 public class DbConnection
@@ -25,9 +24,35 @@ public class DbConnection
 
     #region MongoCollectionDefinitions
     public IMongoCollection<UserModel> UserCollection { get; private set; }
-    public IMongoCollection<ToDoListModel> MyProperty { get; private set; }
-    public IMongoCollection< MyProperty { get; private set; }
+    public IMongoCollection<ToDoListModel> ToDoListCollection { get; private set; }
+    public IMongoCollection<SubscriptionModel> SubscriptionCollection { get; private set; }
+    public IMongoCollection<ProjectModel> ProjectCollection { get; private set; }
+    public IMongoCollection<CommentModel> CommentCollection { get; private set; }
+    public IMongoCollection<DocumentModel> DocumentCollection { get; private set; }
+    public IMongoCollection<ContactGroupModel> ContactGroupCollection { get; private set; }
+    public IMongoCollection<DirectoryModel> DirectoryCollection { get; private set; }
+
 
     #endregion
+
+    public DbConnection(IConfiguration config)
+    {
+        _config = config;
+        Client = new MongoClient(_config.GetConnectionString(_connectionId));
+        DbName = _config["DatabaseName"];
+        _db = Client.GetDatabase(DbName);
+
+        UserCollection = _db.GetCollection<UserModel>(UserCollectionName);
+        ToDoListCollection = _db.GetCollection<ToDoListModel>(ToDoListCollectionName);
+        SubscriptionCollection = _db.GetCollection<SubscriptionModel>(SubscriptionCollectionName);
+        ProjectCollection = _db.GetCollection<ProjectModel>(ProjectCollectionName);
+        CommentCollection = _db.GetCollection<CommentModel>(CommentCollectionName);
+        DocumentCollection = _db.GetCollection<DocumentModel>(DocumentCollectionName);
+        ContactGroupCollection = _db.GetCollection<ContactGroupModel>(ContacGroupCollectionName);
+        DirectoryCollection = _db.GetCollection<DirectoryModel>(DirectoryCollectionName);
+
+    }
 }
+
+
 
