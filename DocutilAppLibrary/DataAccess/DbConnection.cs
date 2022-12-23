@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 namespace DocutilAppLibrary.DataAccess;
-public class DbConnection
+public class DbConnection : IDbConnection
 {
     private readonly IConfiguration _config;
     private readonly IMongoDatabase _db;
