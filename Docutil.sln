@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocutilBlazorUI", "DocutilBlazorUI\DocutilBlazorUI.csproj", "{3C175BBD-BE93-4A4C-9A31-999958E04D1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocutilAppLibrary", "DocutilAppLibrary\DocutilAppLibrary.csproj", "{1E3030FB-0511-46F0-A42F-577EBE8C051D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C175BBD-BE93-4A4C-9A31-999958E04D1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C175BBD-BE93-4A4C-9A31-999958E04D1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C175BBD-BE93-4A4C-9A31-999958E04D1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C175BBD-BE93-4A4C-9A31-999958E04D1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E3030FB-0511-46F0-A42F-577EBE8C051D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E3030FB-0511-46F0-A42F-577EBE8C051D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E3030FB-0511-46F0-A42F-577EBE8C051D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E3030FB-0511-46F0-A42F-577EBE8C051D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {40E59C49-F6CB-495B-A138-30F0E929B88C}
+	EndGlobalSection
+EndGlobal
