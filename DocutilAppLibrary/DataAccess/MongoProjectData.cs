@@ -1,8 +1,6 @@
-﻿
-
-namespace DocutilAppLibrary.DataAccess
+﻿namespace DocutilAppLibrary.DataAccess
 {
-    public class MongoProjectData
+    public class MongoProjectData : IProjectData
     {
         private readonly IMongoCollection<ProjectModel> _projects;
         private readonly IDbConnection _db;
@@ -45,6 +43,7 @@ namespace DocutilAppLibrary.DataAccess
                 await projectsInTransaction.InsertOneAsync(project);
 
                 await session.CommitTransactionAsync();
+
             }
             catch
             {
