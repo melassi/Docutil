@@ -14,7 +14,6 @@ namespace DocutilAppLibrary.Models
             FirstName = user.FirstName;
             LastName = user.LastName;
 
-
         }
     }
 }

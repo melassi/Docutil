@@ -1,8 +1,6 @@
-﻿
-
-namespace DocutilAppLibrary.DataAccess
+﻿namespace DocutilAppLibrary.DataAccess
 {
-    public class MongoCommentData
+    public class MongoCommentData : ICommentData
     {
         private readonly IMongoCollection<CommentModel> _comments;
         private readonly IDbConnection _db;
@@ -41,12 +39,16 @@ namespace DocutilAppLibrary.DataAccess
                 await commentsInTransaction.InsertOneAsync(comment);
 
                 var documentsInTransaction = db.GetCollection<DocumentModel>(_db.DocumentCollectionName);
-                var document = await _documentdata.
-                return _comments.InsertOneAsync(comment);
+                var document = await _documentdata.GetDocumentById(comment.DocumentId);
+                document.Comments.Add(new BasicCommentModel(comment));
+                await documentsInTransaction.ReplaceOneAsync(d => d.Id == document.Id, document);
+
+                await session.CommitTransactionAsync();
+
             }
             catch (Exception)
             {
-
+                await session.AbortTransactionAsync();
                 throw;
             }
 
