@@ -13,7 +13,9 @@ namespace DocutilAppLibrary.DataAccess
         private readonly IDbConnection _db;
 
 
-        public MongoDocumentData() { }
+        public MongoDocumentData(Interfaces.IDbConnection db) {
+            _documents = db.DocumentCollection;
+        }
 
         //Load All Documents by Project
         public async Task<List<DocumentModel>> GetAllDocumentsByProject(string projectId)

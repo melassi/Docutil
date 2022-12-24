@@ -1,4 +1,4 @@
-﻿namespace DocutilAppLibrary.DataAccess
+﻿namespace DocutilAppLibrary.Interfaces
 {
     public interface ICommentData
     {

@@ -1,7 +1,8 @@
 ﻿
-namespace DocutilAppLibrary.DataAccess
-{
+namespace DocutilAppLibrary.DataAccess;
+
     public class MongoContactGroupData
     {
+
     }
-}
+
