@@ -12,7 +12,6 @@ namespace DocutilAppLibrary.Models
         public DateTime DateTimeCreated { get; set; }
         public DateTime DateTimeEdited { get; set; }
         public string CommentedRevision { get; set; }
-        [BsonRepresentation(BsonType.ObjectId)]
         public string DocumentId { get; set; }
 
     }

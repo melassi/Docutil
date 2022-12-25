@@ -8,9 +8,11 @@ namespace DocutilAppLibrary.DataAccess;
 public class MongoUserData : IUserData
 {
     private readonly IMongoCollection<UserModel> _users;
+    private readonly Interfaces.IDbConnection _db;
 
     public MongoUserData(Interfaces.IDbConnection db)
     {
+        _db = db;
         _users = db.UserCollection;
     }
 

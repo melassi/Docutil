@@ -6,9 +6,11 @@
         private readonly IDbConnection _db;
         private readonly IDocumentData _documentdata;
 
-        public MongoCommentData(Interfaces.IDbConnection db)
+        public MongoCommentData(Interfaces.IDbConnection db, IDocumentData documentData)
         {
+            _db = db;
             _comments = db.CommentCollection;
+            _documentdata = documentData;
         }
 
         //GetCommentByBasicUser

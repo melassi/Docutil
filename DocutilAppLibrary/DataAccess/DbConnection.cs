@@ -5,7 +5,7 @@ public class DbConnection : IDbConnection
 {
     private readonly IConfiguration _config;
     private readonly IMongoDatabase _db;
-    private string _connectionId = "mondodb";
+    private string _connectionId = "mongodb";
 
     public string DbName { get; set; }
     public MongoClient Client { get; private set; }

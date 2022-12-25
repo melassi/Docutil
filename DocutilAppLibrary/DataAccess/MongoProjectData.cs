@@ -8,6 +8,7 @@
 
         public MongoProjectData(IDbConnection db)
         {
+            _db = db;
             _projects = db.ProjectCollection;
         }
 

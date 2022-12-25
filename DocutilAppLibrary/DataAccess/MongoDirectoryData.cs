@@ -2,10 +2,12 @@
 {
     public class MongoDirectoryData : IDirectoryData
     {
+        private readonly IDbConnection _db;
         private IMongoCollection<DirectoryModel> _directories;
 
         public MongoDirectoryData(Interfaces.IDbConnection db)
         {
+            _db = db;
             _directories = db.DirectoryCollection;
         }
 

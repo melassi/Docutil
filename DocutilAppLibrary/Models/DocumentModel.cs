@@ -14,7 +14,6 @@ namespace DocutilAppLibrary.Models
         public string DocumentType { get; set; }
         public DateTime DateTimeCreated { get; set; }
         public string DocumentSize { get; set; }
-        [BsonRepresentation(BsonType.ObjectId)]
         public string ProjectId { get; set; }
         public string ParentDirectoryId { get; set; }
 

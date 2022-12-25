@@ -14,6 +14,7 @@ namespace DocutilAppLibrary.DataAccess
 
 
         public MongoDocumentData(Interfaces.IDbConnection db) {
+            _db = db;
             _documents = db.DocumentCollection;
         }
 

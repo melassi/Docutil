@@ -1,16 +1,400 @@
 ﻿@page "/Sample"
-@inject ICommentData
-@inject IDirectoryData
-@inject IDocumentData
-@inject IProjectData
-@inject IUserData
+@using MongoDB.Bson;
+@inject ICommentData commentData
+@inject IDirectoryData directoryData
+@inject IDocumentData documentData
+@inject IProjectData projectData
+@inject IUserData userData
 
 <PageTitle>SampleDataCreator</PageTitle>
 
 <h1>SampleData</h1>
-
-
+@if (dataCreated is not true)
+{
+    <button class="btn btn-danger" @onclick="GenerateSampleData">Generate Sample Data *ONLY KLICK ONCE*</button>
+}else{
+    <h4>Data Created!</h4>
+}
 @code {
+    private bool dataCreated = false;
 
+    protected async override Task OnInitializedAsync()
+    {
+        if (userData.GetAllUsersAsync() is not null && projectData.GetAllProjects() is not null)
+        {
+            dataCreated = true;
+        }
+
+    }
+
+    private async Task GenerateSampleData()
+    {
+        //First User and their Project , Directories and Documents
+        // Create a new user
+        UserModel user = new UserModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                ObjectIdentifier = "123",
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "john.doe@example.com",
+                AddressField1 = "123 Main St.",
+                AddressField2 = "Apt. 1",
+                ZipCode = "12345",
+                Area = "New York",
+                Country = "USA",
+                DateCreated = DateTime.Now,
+                UserType = "Standard",
+                SubscriptionType = "Monthly"
+            };
+        await userData.CreateUser(user);
+
+        // Create a new project for the user
+        ProjectModel project = new ProjectModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                ProjectName = "New House",
+                ProjectDescription = "Building a new house",
+                ProjectUsers = new List<BasicUserModel> { new BasicUserModel(user) },
+                ProjectAdmins = new List<BasicUserModel> { new BasicUserModel(user) },
+                ProjectStatus = "In Progress",
+                ProjectLocation = "123 Main St.",
+                DateTimeCreated = DateTime.Now,
+                FavouriteItems = new List<IListItem>()
+            };
+        await projectData.CreateProject(project);
+
+        // Create a new directory for the project
+        DirectoryModel directory = new DirectoryModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DirectoryName = "Floor Plans",
+                DirectoryDescription = "Floor plans for the new house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                ParentDirectoryId = "",
+                ProjectId = project.Id,
+                DirectorySharePassword = "",
+                DirectoryShareState = "Private",
+                DirectoryTipps = "",
+                DirectoryBreadcrumbs = "Home > New House > Floor Plans",
+                DirectoryIcon = "fa-folder",
+                UserReadClaim = new BasicUserModel(user)
+            };
+        await directoryData.CreateDirectory(directory);
+
+        // Create a subdirectory within the main directory
+        DirectoryModel subDirectory = new DirectoryModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DirectoryName = "First Floor",
+                DirectoryDescription = "Floor plans for the first floor of the new house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                ParentDirectoryId = directory.Id,
+                ProjectId = project.Id,
+                DirectorySharePassword = "",
+                DirectoryShareState = "Private",
+                DirectoryTipps = "",
+                DirectoryBreadcrumbs = "Home > New House > Floor Plans > First Floor",
+                DirectoryIcon = "fa-folder",
+                UserReadClaim = new BasicUserModel(user)
+            };
+        await directoryData.CreateDirectory(subDirectory);
+        // Create a document within the subdirectory
+        DocumentModel document = new DocumentModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DocumentTitle = "First Floor Plan",
+                DocumentDescription = "Floor plan for the first floor of the new house",
+                Comments = new List<BasicCommentModel>(),
+                UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
+                Revisions = new List<RevisionModel>(),
+                DocumentType = "application/pdf",
+                DateTimeCreated = DateTime.Now,
+                DocumentSize = "1 MB",
+                ProjectId = project.Id,
+                ParentDirectoryId = subDirectory.Id
+            };
+        await documentData.CreateDocument(document);
+
+        // Create a revision for the document
+        RevisionModel revision = new RevisionModel
+            {
+                RevisionId = ObjectId.GenerateNewId().ToString(),
+                AzureFileId = "abc123",
+                RevisionAuthor = new BasicUserModel(user),
+                DateTimeCreated = DateTime.Now
+            };
+        await documentData.CreateRevision(document, revision);
+        // Create a second revision for the document
+        revision = new RevisionModel
+            {
+                RevisionId = ObjectId.GenerateNewId().ToString(),
+                AzureFileId = "def456",
+                RevisionAuthor = new BasicUserModel(user),
+                DateTimeCreated = DateTime.Now
+            };
+        await documentData.CreateRevision(document, revision);
+
+        // Create a comment for the document
+        CommentModel comment = new CommentModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                Author = new BasicUserModel(user),
+                Text = "Great work on the floor plan!",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                CommentedRevision = revision.RevisionId,
+                DocumentId = document.Id
+            };
+        await commentData.CreateComment(comment);
+        // Create a second comment for the document
+        comment = new CommentModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                Author = new BasicUserModel(user),
+                Text = "I think we should add a second staircase in the back of the house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                CommentedRevision = revision.RevisionId,
+                DocumentId = document.Id
+            };
+        await commentData.CreateComment(comment);
+        // Create a second document within the subdirectory
+        document = new DocumentModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DocumentTitle = "Second Floor Plan",
+                DocumentDescription = "Floor plan for the second floor of the new house",
+                Comments = new List<BasicCommentModel>(),
+                UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
+                Revisions = new List<RevisionModel>(),
+                DocumentType = "application/pdf",
+                DateTimeCreated = DateTime.Now,
+                DocumentSize = "1 MB",
+                ProjectId = project.Id,
+                ParentDirectoryId = subDirectory.Id
+            };
+        await documentData.CreateDocument(document);
+
+        // Create a revision for the second document
+        revision = new RevisionModel
+            {
+                RevisionId = ObjectId.GenerateNewId().ToString(),
+                AzureFileId = "ghi789",
+                RevisionAuthor = new BasicUserModel(user),
+                DateTimeCreated = DateTime.Now
+            };
+        await documentData.CreateRevision(document, revision);
+        // Create a second revision for the second document
+        revision = new RevisionModel
+            {
+                RevisionId = ObjectId.GenerateNewId().ToString(),
+                AzureFileId = "jkl123",
+                RevisionAuthor = new BasicUserModel(user),
+                DateTimeCreated = DateTime.Now
+            };
+        await documentData.CreateRevision(document, revision);
+        // Create a second subdirectory within the first directory
+        subDirectory = new DirectoryModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DirectoryName = "Exterior Designs",
+                DirectoryDescription = "Designs for the exterior of the new house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                ParentDirectoryId = directory.Id,
+                ProjectId = project.Id,
+                DirectorySharePassword = "",
+                DirectoryShareState = "private",
+                DirectoryTipps = "",
+                DirectoryBreadcrumbs = "",
+                DirectoryIcon = "",
+                UserReadClaim = new BasicUserModel(user)
+            };
+        await directoryData.CreateDirectory(subDirectory);
+
+        // Create a document within the second subdirectory
+        document = new DocumentModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DocumentTitle = "Exterior Renderings",
+                DocumentDescription = "3D renderings of the exterior of the new house",
+                Comments = new List<BasicCommentModel>(),
+                UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
+                Revisions = new List<RevisionModel>(),
+                DocumentType = "application/pdf",
+                DateTimeCreated = DateTime.Now,
+                DocumentSize = "2 MB",
+                ProjectId = project.Id,
+                ParentDirectoryId = subDirectory.Id
+            };
+        await documentData.CreateDocument(document);
+        // Create a second document within the first subdirectory
+        document = new DocumentModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DocumentTitle = "Interior Renderings",
+                DocumentDescription = "3D renderings of the interior of the new house",
+                Comments = new List<BasicCommentModel>(),
+                UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
+                Revisions = new List<RevisionModel>(),
+                DocumentType = "application/pdf",
+                DateTimeCreated = DateTime.Now,
+                DocumentSize = "2 MB",
+                ProjectId = project.Id,
+                ParentDirectoryId = subDirectory.Id
+            };
+        await documentData.CreateDocument(document);
+
+        // Create a second directory within the project
+        directory = new DirectoryModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DirectoryName = "Structural Designs",
+                DirectoryDescription = "Designs for the structural elements of the new house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                ParentDirectoryId = "",
+                ProjectId = project.Id,
+                DirectorySharePassword = "",
+                DirectoryShareState = "private",
+                DirectoryTipps = "",
+                DirectoryBreadcrumbs = "",
+                DirectoryIcon = "",
+                UserReadClaim = new BasicUserModel(user)
+            };
+        await directoryData.CreateDirectory(directory);
+        // Create a first document within the directory
+        document = new DocumentModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DocumentTitle = "Floor Plans",
+                DocumentDescription = "Floor plans for the new house",
+                Comments = new List<BasicCommentModel>(),
+                UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
+                Revisions = new List<RevisionModel>(),
+                DocumentType = "application/pdf",
+                DateTimeCreated = DateTime.Now,
+                DocumentSize = "1 MB",
+                ProjectId = project.Id,
+                ParentDirectoryId = directory.Id
+            };
+        await documentData.CreateDocument(document);
+
+        // Create a second document within the directory
+        document = new DocumentModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DocumentTitle = "Elevations",
+                DocumentDescription = "Elevation drawings of the new house",
+                Comments = new List<BasicCommentModel>(),
+                UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
+                Revisions = new List<RevisionModel>(),
+                DocumentType = "application/pdf",
+                DateTimeCreated = DateTime.Now,
+                DocumentSize = "2 MB",
+                ProjectId = project.Id,
+                ParentDirectoryId = directory.Id
+            };
+        await documentData.CreateDocument(document);
+        // Create a first subdirectory within the parent directory
+        subDirectory = new DirectoryModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DirectoryName = "Foundation",
+                DirectoryDescription = "Drawings and documents related to the foundation of the house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                ParentDirectoryId = directory.Id,
+                ProjectId = project.Id,
+                DirectorySharePassword = "",
+                DirectoryShareState = "Private",
+                DirectoryTipps = "",
+                DirectoryBreadcrumbs = "",
+                DirectoryIcon = "folder",
+                UserReadClaim = new BasicUserModel(user)
+            };
+        await directoryData.CreateDirectory(subDirectory);
+
+        // Create a second subdirectory within the parent directory
+        subDirectory = new DirectoryModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DirectoryName = "Plumbing",
+                DirectoryDescription = "Drawings and documents related to the plumbing of the house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                ParentDirectoryId = directory.Id,
+                ProjectId = project.Id,
+                DirectorySharePassword = "",
+                DirectoryShareState = "Private",
+                DirectoryTipps = "",
+                DirectoryBreadcrumbs = "",
+                DirectoryIcon = "folder",
+                UserReadClaim = new BasicUserModel(user)
+            };
+        await directoryData.CreateDirectory(subDirectory);
+        // Create a new directory
+        directory = new DirectoryModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DirectoryName = "Exterior",
+                DirectoryDescription = "Drawings and documents related to the exterior of the house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                ParentDirectoryId = "", // This is the root directory, so it has no parent
+                ProjectId = project.Id,
+                DirectorySharePassword = "",
+                DirectoryShareState = "Private",
+                DirectoryTipps = "",
+                DirectoryBreadcrumbs = "",
+                DirectoryIcon = "folder",
+                UserReadClaim = new BasicUserModel(user)
+            };
+        await directoryData.CreateDirectory(directory);
+
+        // Create a subdirectory within the new directory
+        subDirectory = new DirectoryModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DirectoryName = "Windows",
+                DirectoryDescription = "Drawings and documents related to the windows of the house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                ParentDirectoryId = directory.Id,
+                ProjectId = project.Id,
+                DirectorySharePassword = "",
+                DirectoryShareState = "Private",
+                DirectoryTipps = "",
+                DirectoryBreadcrumbs = "",
+                DirectoryIcon = "folder",
+                UserReadClaim = new BasicUserModel(user)
+            };
+        await directoryData.CreateDirectory(subDirectory);
+        // Create a new directory
+        directory = new DirectoryModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                DirectoryName = "Interior",
+                DirectoryDescription = "Drawings and documents related to the interior of the house",
+                DateTimeCreated = DateTime.Now,
+                DateTimeEdited = DateTime.Now,
+                ParentDirectoryId = "", // This is the root directory, so it has no parent
+                ProjectId = project.Id,
+                DirectorySharePassword = "",
+                DirectoryShareState = "Private",
+                DirectoryTipps = "Make sure to include all relevant drawings, such as floor plans, electrical plans, and plumbing plans",
+                DirectoryBreadcrumbs = "",
+                DirectoryIcon = "folder",
+                UserReadClaim = new BasicUserModel(user)
+            };
+        await directoryData.CreateDirectory(directory);
+        if (userData.GetAllUsersAsync() is not null && projectData.GetAllProjects() is not null)
+        {
+            dataCreated = true;
+        }
+    }
 
 }
