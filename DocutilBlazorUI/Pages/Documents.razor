@@ -1,0 +1,169 @@
+﻿@page "/Documents"
+
+@inject ICommentData commentData
+@inject IDirectoryData directoryData
+@inject IDocumentData documentData
+@inject IProjectData projectData
+@inject IUserData userData
+@inject NavigationManager navManager
+@inject ProtectedSessionStorage sessionStorage
+
+<h3>Documents</h3>
+<div class="button-section">
+    <button type="button" class="btn btn-primary">+ Neu</button>
+    <button type="button" class="btn btn-primary">Hochladen</button>
+</div>
+<div class="breadcrumb-area">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Documents</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Home</li>
+        </ol>
+    </nav>
+</div>
+<div class="directory-tipp">
+    <input class="form-control" type="text" placeholder="Dieser Text ist besonders Hilfreich" readonly />
+</div>
+<div class="form-outline">
+    <input type="search" id="form1" class="form-control" placeholder="Type query" aria-label="Search" @oninput="((txt) => OnSearchInput((string)txt.Value))" />
+</div>
+<div class="listitem-table">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <td></td>
+                <td>Name</td>
+                <td>Last Changed</td>
+                <td>Type</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (ListItemModel item in allListItems)
+            {
+
+                <tr @onclick="(() => OnListItemClick(item))">
+                    <td style="width:5px">
+                        @if (item.Type == "Directory")
+                        {
+                            <i class="bi bi-folder"></i>
+                        }
+                        else if (item.Type == "application/pdf")
+                        {
+                            <i class="bi bi-filetype-pdf"></i>
+                        }
+                    </td>
+                    <td>@item.Name</td>
+                    <td>@item.LastChanged</td>
+                    <td>@item.Type</td>
+
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+@code {
+    private List<UserModel> userId = new();
+    private List<DirectoryModel> directories = new();
+    private List<DocumentModel> docs = new();
+    private ProjectModel project = new() { Id = "63a8d53ebb7a2c6ae8412267" };
+    private List<ListItemModel> allListItems = new();
+    private string searchText = "";
+    private bool isSortedbyNew = false;
+    private DirectoryModel currentDirectory = new(){Id=""};
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadFilterState();
+            await FilterListItems();
+            StateHasChanged();
+        }
+
+    }
+
+    private async Task LoadFilterState()
+    {
+
+        var stringResults = await sessionStorage.GetAsync<string>(nameof(searchText));
+        searchText = stringResults.Success ? stringResults.Value : "";
+
+        var boolResults = await sessionStorage.GetAsync<bool>(nameof(isSortedbyNew));
+        isSortedbyNew = boolResults.Success ? boolResults.Value : true;
+
+    }
+
+    private async Task SaveFilterState()
+    {
+
+        await sessionStorage.SetAsync(nameof(searchText), searchText);
+        await sessionStorage.SetAsync(nameof(isSortedbyNew), isSortedbyNew);
+
+    }
+
+    private async Task FilterListItems()
+    {
+        List<ListItemModel> output = new();
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            var dirlist = await directoryData.GetDirectoriesByParent(currentDirectory.Id);
+            foreach (var item in dirlist)
+            {
+                output.Add(item.ToListItem());   
+            }
+            var doclist = await documentData.GetAllDocumentsByDirectory(currentDirectory.Id);
+            foreach (var item in doclist)
+            {
+                output.Add(item.ToListItem());
+            }
+
+        }
+        else
+        {
+            var dirlist = await directoryData.GetDirectoriesByProject(project.Id);
+            foreach (var item in dirlist.Where(d => d.Name.ToLower().Contains(searchText.ToLower()) || d.DirectoryDescription.ToLower().Contains(searchText.ToLower()) ))
+            {
+                output.Add(item.ToListItem());
+            }
+            var doclist = await documentData.GetAllDocumentsByProject(project.Id);
+            foreach (var item in doclist.Where(d => d.Name.ToLower().Contains(searchText.ToLower()) || d.DocumentDescription.ToLower().Contains(searchText.ToLower())))
+            {
+                output.Add(item.ToListItem());
+            }
+        }
+
+        allListItems = output;
+
+
+
+        await SaveFilterState();
+    }
+
+    private async Task OnSearchInput(string seachInput)
+    {
+        searchText = seachInput;
+        await FilterListItems();
+    }
+
+    private async Task OnListItemClick(ListItemModel item)
+    {
+        switch (item.Type)
+        {
+            case "Directory":
+                currentDirectory = await directoryData.GetDirectoryById(item.Id);
+                await FilterListItems();
+                break;
+            case "application/pdf":
+                navManager.NavigateTo("/sample");
+                break;
+
+            default:
+                break;
+        }
+        
+    }
+
+}

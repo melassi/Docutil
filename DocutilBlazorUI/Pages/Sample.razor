@@ -14,14 +14,69 @@
     <button class="btn btn-danger" @onclick="GenerateSampleData">Generate Sample Data *ONLY KLICK ONCE*</button>
 }else{
     <h4>Data Created!</h4>
+    <table class="table table-striped">
+         <thead class="thead-dark">
+        <tr>
+            <td></td>
+            <td>Name</td>
+            <td>Last Changed</td>
+            <td>Type</td>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (ListItemModel item in allListItems)
+            {
+                <tr><td style="width:5px">
+                    @if (item.Type == "Directory")
+                    {
+                            <i class="bi bi-folder"></i>
+                    }else if(item.Type=="application/pdf"){
+                            <i class="bi bi-filetype-pdf"></i>
+                    }
+                </td>    
+             <td>@item.Name</td>
+             <td>@item.LastChanged</td>
+             <td>@item.Type</td>
+
+         </tr>
+        }
+        </tbody>
+
+    </table>
+
 }
 @code {
-    private bool dataCreated = false;
+    private bool dataCreated = true;
+    private List<UserModel> allUsers = new();
+    private List<DirectoryModel> allDirectories = new();
+    private List<DocumentModel> allDocs = new();
+    private List<ProjectModel> allProjects = new();
+    private List<ListItemModel> allListItems = new();
 
     protected async override Task OnInitializedAsync()
     {
-        if (userData.GetAllUsersAsync() is not null && projectData.GetAllProjects() is not null)
+        dataCreated = false;
+        allUsers = await userData.GetAllUsersAsync();
+        allProjects = await projectData.GetAllProjects();
+
+        if (allUsers.Count > 0  && allProjects.Count > 0)
         {
+            
+            foreach (var project in allProjects)
+            {
+                allDirectories = await directoryData.GetDirectoriesByProject(project.Id);
+                foreach (var directory in allDirectories)
+                {
+                    allListItems.Add(directory.ToListItem());
+                }
+                allDocs = await documentData.GetAllDocumentsByProject(project.Id);
+                foreach (var document in allDocs)
+                {
+                    allListItems.Add(document.ToListItem());
+                }
+
+
+            }
             dataCreated = true;
         }
 
@@ -68,7 +123,7 @@
         DirectoryModel directory = new DirectoryModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DirectoryName = "Floor Plans",
+                Name = "Floor Plans",
                 DirectoryDescription = "Floor plans for the new house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
@@ -87,7 +142,7 @@
         DirectoryModel subDirectory = new DirectoryModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DirectoryName = "First Floor",
+                Name = "First Floor",
                 DirectoryDescription = "Floor plans for the first floor of the new house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
@@ -105,7 +160,7 @@
         DocumentModel document = new DocumentModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DocumentTitle = "First Floor Plan",
+                Name = "First Floor Plan",
                 DocumentDescription = "Floor plan for the first floor of the new house",
                 Comments = new List<BasicCommentModel>(),
                 UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
@@ -165,7 +220,7 @@
         document = new DocumentModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DocumentTitle = "Second Floor Plan",
+                Name = "Second Floor Plan",
                 DocumentDescription = "Floor plan for the second floor of the new house",
                 Comments = new List<BasicCommentModel>(),
                 UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
@@ -200,7 +255,7 @@
         subDirectory = new DirectoryModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DirectoryName = "Exterior Designs",
+                Name = "Exterior Designs",
                 DirectoryDescription = "Designs for the exterior of the new house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
@@ -219,7 +274,7 @@
         document = new DocumentModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DocumentTitle = "Exterior Renderings",
+                Name = "Exterior Renderings",
                 DocumentDescription = "3D renderings of the exterior of the new house",
                 Comments = new List<BasicCommentModel>(),
                 UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
@@ -235,7 +290,7 @@
         document = new DocumentModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DocumentTitle = "Interior Renderings",
+                Name = "Interior Renderings",
                 DocumentDescription = "3D renderings of the interior of the new house",
                 Comments = new List<BasicCommentModel>(),
                 UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
@@ -252,7 +307,7 @@
         directory = new DirectoryModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DirectoryName = "Structural Designs",
+                Name = "Structural Designs",
                 DirectoryDescription = "Designs for the structural elements of the new house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
@@ -270,7 +325,7 @@
         document = new DocumentModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DocumentTitle = "Floor Plans",
+                Name = "Floor Plans",
                 DocumentDescription = "Floor plans for the new house",
                 Comments = new List<BasicCommentModel>(),
                 UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
@@ -287,7 +342,7 @@
         document = new DocumentModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DocumentTitle = "Elevations",
+                Name = "Elevations",
                 DocumentDescription = "Elevation drawings of the new house",
                 Comments = new List<BasicCommentModel>(),
                 UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
@@ -303,7 +358,7 @@
         subDirectory = new DirectoryModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DirectoryName = "Foundation",
+                Name = "Foundation",
                 DirectoryDescription = "Drawings and documents related to the foundation of the house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
@@ -322,7 +377,7 @@
         subDirectory = new DirectoryModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DirectoryName = "Plumbing",
+                Name = "Plumbing",
                 DirectoryDescription = "Drawings and documents related to the plumbing of the house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
@@ -340,7 +395,7 @@
         directory = new DirectoryModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DirectoryName = "Exterior",
+                Name = "Exterior",
                 DirectoryDescription = "Drawings and documents related to the exterior of the house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
@@ -359,7 +414,7 @@
         subDirectory = new DirectoryModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DirectoryName = "Windows",
+                Name = "Windows",
                 DirectoryDescription = "Drawings and documents related to the windows of the house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
@@ -377,7 +432,7 @@
         directory = new DirectoryModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                DirectoryName = "Interior",
+                Name = "Interior",
                 DirectoryDescription = "Drawings and documents related to the interior of the house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
@@ -391,7 +446,8 @@
                 UserReadClaim = new BasicUserModel(user)
             };
         await directoryData.CreateDirectory(directory);
-        if (userData.GetAllUsersAsync() is not null && projectData.GetAllProjects() is not null)
+
+        if (allUsers.Count > 0 && allProjects.Count > 0)
         {
             dataCreated = true;
         }

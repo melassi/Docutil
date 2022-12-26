@@ -8,6 +8,7 @@
         Task DeleteRevision(DocumentModel document, RevisionModel revision);
         Task<List<DocumentModel>> GetAllDocumentsByDirectory(string parentId);
         Task<List<DocumentModel>> GetAllDocumentsByProject(string projectId);
+        Task<List<ListItemModel>> GetListItemAllDocumentsByProject(string projectId);
         Task<List<DocumentModel>> GetAllDocumentsByUser(BasicUserModel user);
         Task<DocumentModel> GetDocumentById(string documentId);
     }

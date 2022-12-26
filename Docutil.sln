@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocutilBlazorUI", "DocutilBlazorUI\DocutilBlazorUI.csproj", "{3C175BBD-BE93-4A4C-9A31-999958E04D1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocutilBlazorUI", "DocutilBlazorUI\DocutilBlazorUI.csproj", "{3C175BBD-BE93-4A4C-9A31-999958E04D1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocutilAppLibrary", "DocutilAppLibrary\DocutilAppLibrary.csproj", "{1E3030FB-0511-46F0-A42F-577EBE8C051D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocutilAppLibrary", "DocutilAppLibrary\DocutilAppLibrary.csproj", "{1E3030FB-0511-46F0-A42F-577EBE8C051D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

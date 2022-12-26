@@ -13,13 +13,33 @@
 
 
         //GetDirectoriesByProject<List<DirectorieModel>>
-        public async Task<List<DirectoryModel>> GerDirectoriesByProject(string projectid)
+        public async Task<List<DirectoryModel>> GetDirectoriesByProject(string projectid)
         {
-            var results = await _directories.FindAsync(d => d.Id == projectid);
+            var results = await _directories.FindAsync(d => d.ProjectId == projectid);
             return results.ToList();
 
         }
 
+        //GetListItemsofDirectories by Project
+        public async Task<List<ListItemModel>> GetListItemDirectoriesByProject(string projectId)
+        {
+            var results = await _directories.FindAsync(d => d.ProjectId == projectId);
+            List<ListItemModel> output = new();
+            foreach (var item in results.ToList())
+            {
+                output.Add(item.ToListItem());
+            }
+            return output;
+        }
+
+        //Get Directory By ID
+        public async Task<DirectoryModel> GetDirectoryById(string id)
+        {
+            var results = await _directories.FindAsync(d => d.Id == id);
+            DirectoryModel output = results.First();
+
+            return output;
+        }
 
         //GetDirectoriesByParent<List<DirectorieModel>>
         public async Task<List<DirectoryModel>> GetDirectoriesByParent(string parentid)

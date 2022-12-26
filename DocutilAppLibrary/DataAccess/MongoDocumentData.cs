@@ -25,6 +25,19 @@ namespace DocutilAppLibrary.DataAccess
             return result.ToList();
 
         }
+        //Load All Documents as ListItem by Project
+        public async Task<List<ListItemModel>> GetListItemAllDocumentsByProject(string projectId)
+        {
+            var result = await _documents.FindAsync(d => d.ProjectId == projectId);
+            List<ListItemModel> output = new();
+            foreach (var item in result.ToList())
+            {
+                output.Add(item.ToListItem());
+            }
+            return output;
+
+        }
+
 
         //load All Documents by User
         public async Task<List<DocumentModel>> GetAllDocumentsByUser(BasicUserModel user)

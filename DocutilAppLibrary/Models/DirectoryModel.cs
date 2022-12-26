@@ -7,7 +7,7 @@ namespace DocutilAppLibrary.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
-        public string DirectoryName { get; set; }
+        public string Name { get; set; }
         public string DirectoryDescription { get; set; }
         public DateTime DateTimeCreated { get; set; }
         public DateTime DateTimeEdited { get; set; }
@@ -20,5 +20,14 @@ namespace DocutilAppLibrary.Models
         public string DirectoryIcon { get; set; }
         public BasicUserModel UserReadClaim { get; set; }
 
+        public ListItemModel ToListItem()
+        {
+            ListItemModel item = new();
+            item.Id = Id;
+            item.Name = Name;
+            item.LastChanged = DateTimeEdited;
+            item.Type = "Directory";
+            return item;
+        }
     }
 }

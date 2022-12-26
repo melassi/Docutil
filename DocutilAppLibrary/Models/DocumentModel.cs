@@ -6,7 +6,7 @@ namespace DocutilAppLibrary.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
-        public string DocumentTitle { get; set; }
+        public string Name { get; set; }
         public string DocumentDescription { get; set; }
         public List<BasicCommentModel> Comments { get; set; }
         public List<BasicUserModel> UsersReadClaim { get; set; }
@@ -18,6 +18,23 @@ namespace DocutilAppLibrary.Models
         public string ParentDirectoryId { get; set; }
 
 
+        public ListItemModel ToListItem()
+        {
+            ListItemModel item = new();
+            item.Id = Id;
+            item.Name = Name;
+            if(Revisions.Count > 0)
+            {
+                item.LastChanged = Revisions.Last().DateTimeCreated;
+            }
+            else
+            {
+                item.LastChanged = DateTimeCreated; 
+            }
 
+            item.Type = DocumentType;
+            return item;
+
+        }
     }
 }
