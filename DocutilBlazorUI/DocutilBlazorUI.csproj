@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\..\..\AppData\Roaming\Microsoft\UserSecrets\c62b1362-5f69-49af-bb0b-5fcfcead8157\secrets.json" Link="secrets.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="C:\Users\DEU219175\source\repos\Docutil\DocutilBlazorUI\.editorconfig" />
   </ItemGroup>
 
