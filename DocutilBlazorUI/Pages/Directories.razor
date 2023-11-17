@@ -1,4 +1,4 @@
-﻿@page "/Documents"
+﻿@page "/Directories"
 
 @inject ICommentData commentData
 @inject IDirectoryData directoryData
@@ -13,20 +13,27 @@
     <button type="button" class="btn btn-primary">+ Neu</button>
     <button type="button" class="btn btn-primary">Hochladen</button>
 </div>
-<div class="breadcrumb-area">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Documents</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Home</li>
-        </ol>
-    </nav>
-</div>
+
 <div class="directory-tipp">
     <input class="form-control" type="text" placeholder="Dieser Text ist besonders Hilfreich" readonly />
 </div>
 <div class="form-outline">
-    <input type="search" id="form1" class="form-control" placeholder="Type query" aria-label="Search" @oninput="((txt) => OnSearchInput((string)txt.Value))" />
+    <input type="search" id="form1" class="form-control" placeholder="Type query" aria-label="Search" value=@searchText @oninput="((txt) => OnSearchInput((string)txt.Value))" />
 </div>
+<button type="button" class="btn btn-primary" @onclick="(() => OnBreadCrumbClick(project.RootDirectory.Id))">Home</button>
+
+@if (!string.IsNullOrEmpty(currentDirectory.ParentDirectoryId))
+{
+    <button type="button" class="btn btn-primary" @onclick="(() => OnBreadCrumbClick(currentDirectory.ParentDirectoryId))">Back</button>
+}
+
+@while (!string.IsNullOrEmpty(tempdir.ParentDirectoryId))
+{
+    directoryitems.Add(tempdir.ParentDirectoryId);
+    tempdir = directories.Where(d => d.Id == tempdir.ParentDirectoryId).FirstOrDefault();
+
+}
+
 <div class="listitem-table">
     <table class="table table-striped table-hover">
         <thead class="thead-dark">
@@ -67,17 +74,26 @@
     private List<UserModel> userId = new();
     private List<DirectoryModel> directories = new();
     private List<DocumentModel> docs = new();
-    private ProjectModel project = new() { Id = "63a8d53ebb7a2c6ae8412267" };
+    private ProjectModel project = new();
     private List<ListItemModel> allListItems = new();
-    private string searchText = "";
+    public string searchText { get; set; } = "";
     private bool isSortedbyNew = false;
-    private DirectoryModel currentDirectory = new(){Id=""};
+    private DirectoryModel currentDirectory = new();
+    private DirectoryModel tempdir = new();
+    private List<string> directoryitems = new();
+
+
 
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            var projects = await projectData.GetAllProjects();
+            project = projects.First();
+            currentDirectory = await directoryData.GetDirectoryById(project.RootDirectory.Id);
+            tempdir = currentDirectory;
+            directories = await directoryData.GetDirectoriesByProject(project.Id);
             await LoadFilterState();
             await FilterListItems();
             StateHasChanged();
@@ -106,6 +122,11 @@
 
     private async Task FilterListItems()
     {
+        if (string.IsNullOrWhiteSpace(currentDirectory.Id))
+        {
+            currentDirectory.Id = project.RootDirectory.Id;
+        }
+        tempdir = currentDirectory;
         List<ListItemModel> output = new();
         if (string.IsNullOrWhiteSpace(searchText))
         {
@@ -150,6 +171,7 @@
 
     private async Task OnListItemClick(ListItemModel item)
     {
+        searchText = "";
         switch (item.Type)
         {
             case "Directory":
@@ -157,13 +179,19 @@
                 await FilterListItems();
                 break;
             case "application/pdf":
-                navManager.NavigateTo("/sample");
+                navManager.NavigateTo($"/viewdoc/{item.Id}");
                 break;
 
             default:
                 break;
         }
-        
+
+    }
+    private async Task OnBreadCrumbClick(string id)
+    {
+        currentDirectory = await directoryData.GetDirectoryById(id);
+        await FilterListItems();
+        directoryitems = new();
     }
 
 }

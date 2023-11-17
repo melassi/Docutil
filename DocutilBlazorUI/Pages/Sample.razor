@@ -61,7 +61,7 @@
 
         if (allUsers.Count > 0  && allProjects.Count > 0)
         {
-            
+
             foreach (var project in allProjects)
             {
                 allDirectories = await directoryData.GetDirectoriesByProject(project.Id);
@@ -116,9 +116,40 @@
                 ProjectLocation = "123 Main St.",
                 DateTimeCreated = DateTime.Now,
                 FavouriteItems = new List<IListItem>()
-            };
-        await projectData.CreateProject(project);
 
+
+    };
+        DirectoryModel rootDirectory = new()
+            {
+
+                Id = ObjectId.GenerateNewId().ToString(),
+                Name = "Home",
+                DirectoryDescription = "Ordner für alle Documente und Ordner des Projektes",
+                DateTimeCreated = new(),
+                ProjectId = project.Id
+
+            };
+        project.RootDirectory = rootDirectory;
+
+        await projectData.CreateProject(project);
+        await directoryData.CreateDirectory(rootDirectory);
+
+        // Create a document within the Home Directory
+        DocumentModel document = new DocumentModel
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                Name = "OrderInfo.Pdf",
+                DocumentDescription = "Floor plan for the first floor of the new house",
+                Comments = new List<BasicCommentModel>(),
+                UsersReadClaim = new List<BasicUserModel> { new BasicUserModel(user) },
+                Revisions = new List<RevisionModel>(),
+                DocumentType = "application/pdf",
+                DateTimeCreated = DateTime.Now,
+                DocumentSize = "1 MB",
+                ProjectId = project.Id,
+                ParentDirectoryId = rootDirectory.Id
+            };
+        await documentData.CreateDocument(document);
         // Create a new directory for the project
         DirectoryModel directory = new DirectoryModel
             {
@@ -127,7 +158,7 @@
                 DirectoryDescription = "Floor plans for the new house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
-                ParentDirectoryId = "",
+                ParentDirectoryId = project.RootDirectory.Id,
                 ProjectId = project.Id,
                 DirectorySharePassword = "",
                 DirectoryShareState = "Private",
@@ -157,7 +188,7 @@
             };
         await directoryData.CreateDirectory(subDirectory);
         // Create a document within the subdirectory
-        DocumentModel document = new DocumentModel
+         document = new DocumentModel
             {
                 Id = ObjectId.GenerateNewId().ToString(),
                 Name = "First Floor Plan",
@@ -311,7 +342,7 @@
                 DirectoryDescription = "Designs for the structural elements of the new house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
-                ParentDirectoryId = "",
+                ParentDirectoryId = project.RootDirectory.Id,
                 ProjectId = project.Id,
                 DirectorySharePassword = "",
                 DirectoryShareState = "private",
@@ -399,7 +430,7 @@
                 DirectoryDescription = "Drawings and documents related to the exterior of the house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
-                ParentDirectoryId = "", // This is the root directory, so it has no parent
+                ParentDirectoryId = project.RootDirectory.Id,
                 ProjectId = project.Id,
                 DirectorySharePassword = "",
                 DirectoryShareState = "Private",
@@ -436,7 +467,7 @@
                 DirectoryDescription = "Drawings and documents related to the interior of the house",
                 DateTimeCreated = DateTime.Now,
                 DateTimeEdited = DateTime.Now,
-                ParentDirectoryId = "", // This is the root directory, so it has no parent
+                ParentDirectoryId = project.RootDirectory.Id, 
                 ProjectId = project.Id,
                 DirectorySharePassword = "",
                 DirectoryShareState = "Private",

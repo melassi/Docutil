@@ -15,6 +15,8 @@ namespace DocutilAppLibrary.Models
         public string ProjectLocation { get; set; }
         public DateTime DateTimeCreated { get; set; }
         public List<IListItem> FavouriteItems { get; set; }
+        public DirectoryModel RootDirectory { get; set; }
+
 
 
     }

@@ -25,6 +25,12 @@
             return result.ToList();
 
         }
+        public async Task<ProjectModel> GetProjectsById(string id)
+        {
+            var result = await _projects.FindAsync(p => p.Id == id);
+            return result.First();
+
+        }
 
         public async Task UpdateProject(ProjectModel project)
         {

@@ -1,0 +1,94 @@
+﻿@page "/viewdoc"
+@page "/viewdoc/{documentId}"
+@inject IDocumentData documentData
+
+<h3>Document View</h3>
+
+@if(documentModel is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+
+    <div id="Viewer" style="float:left">
+        @if (DocumentId == "default")
+        {
+            <span> this is the default page!</span>
+        }
+        else
+        {
+            <span>This page shows the details for @DocumentId</span>
+            <span> @documentModel.Name</span>
+            <span> @documentModel.DocumentDescription</span>
+
+        }
+    </div>
+    <div id="details" style="float:right">
+        in here, you will find details of this document!
+        <p>
+            @if (documentModel is null)
+            {
+                <p>Loading....</p>
+            }
+            else
+            {
+
+
+                @if (documentModel.Revisions.Count > 0)
+                {
+                    @foreach (var item in documentModel.Revisions)
+                    {
+                        <div>
+                            <p>@item.DateTimeCreated</p>
+                            <p>@item.RevisionId</p>
+                        </div>
+
+                    }
+
+                }
+                @if (documentModel.Comments.Count() > 0)
+                {
+                    @foreach (var item in @documentModel.Comments)
+                    {
+                        <div>
+                            <p> @item.DateTimeCreated / @item.Author.FirstName </p>
+                            <p> @item.Comment</p>
+                        </div>
+
+                    }
+                }
+
+
+            }
+
+        </p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string DocumentId { get; set; }
+
+    private DocumentModel documentModel = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        DocumentId = DocumentId ?? "default";
+        if(DocumentId == "default" || string.IsNullOrWhiteSpace(DocumentId))
+        {
+            documentModel = null;
+        }
+        else
+        {
+            documentModel = await documentData.GetDocumentById(DocumentId);
+
+        }
+    }
+
+
+    private DocumentModel currentDoc = new DocumentModel();
+
+
+
+}
