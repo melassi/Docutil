@@ -74,11 +74,11 @@ namespace DocutilAppLibrary.DataAccess
                 var db = client.GetDatabase(_db.DbName);
                 var documentsInTransaction = db.GetCollection<DocumentModel>(_db.DocumentCollectionName);
                 await documentsInTransaction.InsertOneAsync(document);
-
+                await session.CommitTransactionAsync();
             }
             catch (Exception)
             {
-
+                await session.AbortTransactionAsync();
                 throw;
             }
 
